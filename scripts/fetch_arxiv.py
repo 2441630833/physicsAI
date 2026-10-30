@@ -1,4 +1,4 @@
-import json, time, urllib.parse, urllib.request, xml.etree.ElementTree as ET
+import json, re, time, urllib.parse, urllib.request, xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 queries = {'all':'all:"physical AI" OR all:"world model" OR all:"embodied AI" OR all:"physics informed"', 'physical':'all:"physical AI" OR all:"physics informed" OR all:"robot learning" OR all:"embodied AI"', 'world':'all:"world model" OR all:"world models" OR all:"video prediction"'}
@@ -14,7 +14,10 @@ for index,(topic,query) in enumerate(queries.items()):
   get=lambda name:' '.join(e.findtext('a:'+name,default='',namespaces=ns).split())
   url=get('id').replace('http://','https://')
   if not url.startswith('https://arxiv.org/abs/'): continue
-  papers.append({'title':get('title'),'summary':get('summary'),'published':get('published')[:10],'url':url,'id':url.split('/abs/')[-1], 'authors':[a.findtext('a:name',default='',namespaces=ns) for a in e.findall('a:author',ns)],'categories':[c.get('term') for c in e.findall('a:category',ns)]})
+  match=re.search(r'https?://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_./-]+)?', get('summary'), re.I)
+  github=match.group(0).rstrip('.,;:') if match else None
+  papers.append({'github':github,'title':get('title'),'summary':get('summary'),'published':get('published')[:10],'url':url,'id':url.split('/abs/')[-1], 'authors':[a.findtext('a:name',default='',namespaces=ns) for a in e.findall('a:author',ns)],'categories':[c.get('term') for c in e.findall('a:category',ns)]})
  if not papers: raise RuntimeError('No papers returned for '+topic)
+ papers.sort(key=lambda paper: bool(paper['github']), reverse=True)
  data['topics'][topic]=papers
 Path('pages/papers.json').write_text(json.dumps(data,ensure_ascii=False),encoding='utf-8')

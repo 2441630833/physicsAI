@@ -1,6 +1,6 @@
 # Physical Archive
 
-`pages/` 是 GitHub Pages 静态版，展示 arXiv 元数据并跳转原文；不包含投稿或评论。每个专题仅保存最近 100 条，搜索只覆盖这些数据。
+`pages/` 是 GitHub Pages 静态版，展示 arXiv 元数据并跳转原文；不包含投稿或评论。每个专题仅保存最近 100 条，搜索只覆盖这些数据。摘要中包含 GitHub 仓库链接的论文优先显示；该识别方式不验证仓库可用性或许可，也可能遗漏开源代码。
 
 ## 部署
 1. 将项目推送到 GitHub 仓库的 `main` 分支，不要上传 `community.db`。
