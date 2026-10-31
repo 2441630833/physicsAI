@@ -37,9 +37,9 @@ for index,(topic,query) in enumerate(queries.items()):
   url=get('id').replace('http://','https://')
   if not url.startswith('https://arxiv.org/abs/'): continue
   github=find_repo(get('summary'))
-  if not github: continue
   papers.append({'github':github,'title':get('title'),'summary':get('summary'),'published':get('published')[:10],'url':url,'id':url.split('/abs/')[-1], 'authors':[a.findtext('a:name',default='',namespaces=ns) for a in e.findall('a:author',ns)],'categories':[c.get('term') for c in e.findall('a:category',ns)]})
  if not root.findall('a:entry',ns): raise RuntimeError('No arXiv results returned for '+topic)
+ papers.sort(key=lambda paper: bool(paper['github']), reverse=True)
  data['topics'][topic]=papers
 Path('pages/papers.json').write_text(json.dumps(data,ensure_ascii=False),encoding='utf-8')
 
